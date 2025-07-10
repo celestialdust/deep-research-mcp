@@ -1,0 +1,34 @@
+# MCP Server Dependencies
+fastmcp>=2.3.0
+uvicorn>=0.24.0
+starlette>=0.27.0
+
+# LangGraph and LangChain Dependencies
+langgraph>=0.2.6
+langchain>=0.3.19
+langchain-google-genai
+langchain-core>=0.3.19
+langgraph-sdk>=0.1.57
+langgraph-cli
+langgraph-api
+
+# Google AI and Search Dependencies
+google-genai
+
+# Web Framework Dependencies
+fastapi
+
+# Configuration and Environment
+pydantic>=2.0.0
+python-dotenv>=1.0.1
+
+# Async and Concurrency
+asyncio-throttle>=1.0.0
+
+# Logging and Monitoring
+structlog>=23.0.0
+
+# Development Dependencies
+mypy>=1.11.1
+ruff>=0.6.1
+pytest>=8.3.5 
