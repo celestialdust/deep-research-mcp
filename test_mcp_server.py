@@ -15,22 +15,22 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 async def test_server_imports():
     """Test that all server components can be imported."""
-    print("🧪 Testing server imports...")
+    print("Testing server imports...")
     
     try:
         from mcp_server.config import MCPServerConfig
         from mcp_server.agent_adapter import LangGraphAgentAdapter, ProgressCallback
         from mcp_server.utils import validate_research_parameters, sanitize_topic
-        print("✅ All imports successful")
+        print("All imports successful")
     except ImportError as e:
-        print(f"❌ Import failed: {e}")
+        print(f"Import failed: {e}")
         return False
     
     return True
 
 async def test_configuration():
     """Test configuration loading."""
-    print("\n🧪 Testing configuration...")
+    print("\nTesting configuration...")
     
     try:
         from mcp_server.config import MCPServerConfig
@@ -48,17 +48,17 @@ async def test_configuration():
                 port=8000,
                 log_level="INFO"
             )
-            print(f"✅ Configuration created: {config.host}:{config.port}")
+            print(f"Configuration created: {config.host}:{config.port}")
             
     except Exception as e:
-        print(f"❌ Configuration test failed: {e}")
+        print(f"Configuration test failed: {e}")
         return False
     
     return True
 
 async def test_utilities():
     """Test utility functions."""
-    print("\n🧪 Testing utility functions...")
+    print("\nTesting utility functions...")
     
     try:
         from mcp_server.utils import (
@@ -71,12 +71,12 @@ async def test_utilities():
         # Test topic sanitization
         topic = sanitize_topic("This is a test topic")
         assert topic == "This is a test topic"
-        print("✅ Topic sanitization works")
+        print("Topic sanitization works")
         
         # Test execution time formatting
         formatted_time = format_execution_time(65.5)
         assert "1m" in formatted_time
-        print("✅ Time formatting works")
+        print("Time formatting works")
         
         # Test parameter validation
         params = validate_research_parameters(
@@ -86,22 +86,22 @@ async def test_utilities():
             reasoning_model="gemini-2.5-pro"
         )
         assert params["topic"] == "Test topic"
-        print("✅ Parameter validation works")
+        print("Parameter validation works")
         
         # Test error response creation
         error_response = create_error_response(ValueError("Test error"))
         assert "error" in error_response
-        print("✅ Error response creation works")
+        print("Error response creation works")
         
     except Exception as e:
-        print(f"❌ Utility test failed: {e}")
+        print(f"Utility test failed: {e}")
         return False
     
     return True
 
 async def test_progress_callback():
     """Test progress callback functionality."""
-    print("\n🧪 Testing progress callback...")
+    print("\nTesting progress callback...")
     
     try:
         from mcp_server.agent_adapter import ProgressCallback
@@ -123,17 +123,17 @@ async def test_progress_callback():
         assert "[WARNING]" in messages[2]
         assert "[ERROR]" in messages[3]
         
-        print("✅ Progress callback works")
+        print("Progress callback works")
         
     except Exception as e:
-        print(f"❌ Progress callback test failed: {e}")
+        print(f"Progress callback test failed: {e}")
         return False
     
     return True
 
 async def main():
     """Run all tests."""
-    print("🚀 Starting MCP Server Tests")
+    print("Starting MCP Server Tests")
     print("=" * 50)
     
     tests = [
@@ -154,18 +154,18 @@ async def main():
             else:
                 failed += 1
         except Exception as e:
-            print(f"❌ Test {test.__name__} crashed: {e}")
+            print(f"Test {test.__name__} crashed: {e}")
             failed += 1
     
     print("\n" + "=" * 50)
-    print(f"📊 Test Results: {passed} passed, {failed} failed")
+    print(f"Test Results: {passed} passed, {failed} failed")
     
     if failed > 0:
-        print("❌ Some tests failed")
+        print("Some tests failed")
         sys.exit(1)
     else:
-        print("✅ All tests passed!")
-        print("\n🎉 MCP Server is ready to use!")
+        print("All tests passed!")
+        print("\nMCP Server is ready to use!")
         print("To start the server, run:")
         print("  python -m src.mcp_server")
         print("  (Make sure to set GEMINI_API_KEY environment variable)")

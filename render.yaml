@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: deep-research-mcp-server
+    runtime: python3
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.mcp_server.server
+    healthCheckPath: /health
+    envVars:
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PORT
+        fromService:
+          type: web
+          name: deep-research-mcp-server
+          property: port
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: MAX_CONCURRENT_REQUESTS
+        value: "10"
+      - key: DEFAULT_MAX_RESEARCH_LOOPS
+        value: "2"
+      - key: DEFAULT_INITIAL_SEARCH_QUERY_COUNT
+        value: "3"
+      - key: DEFAULT_REASONING_MODEL
+        value: "gemini-2.5-pro"
+      - key: REQUEST_TIMEOUT
+        value: "300"
+      - key: GEMINI_API_KEY
+        sync: false  # This will need to be set manually in Render dashboard
+    # Auto-deploy on code changes
+    autoDeploy: true
+    # Use persistent disk for temporary files (optional)
+    # disk:
+    #   name: mcp-server-data
+    #   mountPath: /tmp/mcp-data
+    #   sizeGB: 1 

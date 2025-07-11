@@ -15,7 +15,7 @@ try:
     HAS_FASTMCP = True
 except ImportError:
     HAS_FASTMCP = False
-    print("⚠️  FastMCP client not available. Install with: pip install fastmcp")
+    print("Warning: FastMCP client not available. Install with: pip install fastmcp")
 
 # Alternative HTTP client for demonstration
 import json
@@ -24,10 +24,10 @@ import aiohttp
 async def test_with_fastmcp_client():
     """Test the MCP server using FastMCP client."""
     if not HAS_FASTMCP:
-        print("❌ FastMCP client not available")
+        print("FastMCP client not available")
         return False
     
-    print("🔍 Testing with FastMCP client...")
+    print("Testing with FastMCP client...")
     
     try:
         # Connect to the MCP server
@@ -41,27 +41,31 @@ async def test_with_fastmcp_client():
                 "initial_search_query_count": 3
             })
             
-            print("✅ Research completed successfully!")
-            print(f"📝 Report length: {len(result['report'])} characters")
-            print(f"🔗 Sources found: {len(result['sources'])}")
-            print(f"⏱️  Execution time: {result['metadata']['execution_time']}s")
+            print("Research completed successfully!")
+            
+            # CORRECT WAY: Access the data attribute which contains the parsed JSON
+            data = result.data  # This is a dictionary
+            
+            print(f"Report length: {len(data['report'])} characters")
+            print(f"Sources found: {len(data['sources'])}")
+            print(f"Execution time: {data['metadata']['execution_time']}s")
             
             # Print a snippet of the report
-            if result['report']:
-                print("\n📄 Report snippet:")
+            if data['report']:
+                print("\nReport snippet:")
                 print("-" * 40)
-                print(result['report'][:500] + "..." if len(result['report']) > 500 else result['report'])
+                print(data['report'][:500] + "..." if len(data['report']) > 500 else data['report'])
                 print("-" * 40)
             
             return True
             
     except Exception as e:
-        print(f"❌ FastMCP client test failed: {e}")
+        print(f"FastMCP client test failed: {e}")
         return False
 
 async def test_with_http_client():
     """Test the MCP server using direct HTTP client."""
-    print("\n🌐 Testing with HTTP client...")
+    print("\nTesting with HTTP client...")
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -69,32 +73,32 @@ async def test_with_http_client():
             async with session.get("http://localhost:8000/health") as response:
                 if response.status == 200:
                     health_data = await response.json()
-                    print(f"✅ Health check passed: {health_data['status']}")
+                    print(f"Health check passed: {health_data['status']}")
                 else:
-                    print(f"❌ Health check failed: {response.status}")
+                    print(f"Health check failed: {response.status}")
                     return False
             
             # Test stats endpoint
             async with session.get("http://localhost:8000/stats") as response:
                 if response.status == 200:
                     stats_data = await response.json()
-                    print(f"📊 Server stats: {stats_data}")
+                    print(f"Server stats: {stats_data}")
                 else:
-                    print(f"⚠️  Stats endpoint returned: {response.status}")
+                    print(f"Warning: Stats endpoint returned: {response.status}")
             
             return True
             
     except Exception as e:
-        print(f"❌ HTTP client test failed: {e}")
+        print(f"HTTP client test failed: {e}")
         return False
 
 async def demonstrate_research_variations():
     """Demonstrate different research configurations."""
     if not HAS_FASTMCP:
-        print("❌ FastMCP client required for research demonstrations")
+        print("FastMCP client required for research demonstrations")
         return False
     
-    print("\n🧪 Demonstrating research variations...")
+    print("\nDemonstrating research variations...")
     
     research_configs = [
         {
@@ -129,16 +133,18 @@ async def demonstrate_research_variations():
     try:
         async with client:
             for demo in research_configs:
-                print(f"\n📋 {demo['name']}:")
+                print(f"\n{demo['name']}:")
                 print(f"   Topic: {demo['config']['topic']}")
                 print(f"   Config: {demo['config']}")
                 
                 try:
                     result = await client.call_tool("research", demo['config'])
-                    print(f"   ✅ Completed in {result['metadata']['execution_time']}s")
-                    print(f"   📊 {result['metadata']['total_sources']} sources, {result['metadata']['queries_executed']} queries")
+                    # CORRECT WAY: Access the data attribute
+                    data = result.data
+                    print(f"   Completed in {data['metadata']['execution_time']}s")
+                    print(f"   {data['metadata']['total_sources']} sources, {data['metadata']['queries_executed']} queries")
                 except Exception as e:
-                    print(f"   ❌ Failed: {e}")
+                    print(f"   Failed: {e}")
                 
                 # Small delay between requests
                 await asyncio.sleep(1)
@@ -146,12 +152,12 @@ async def demonstrate_research_variations():
         return True
         
     except Exception as e:
-        print(f"❌ Research demonstration failed: {e}")
+        print(f"Research demonstration failed: {e}")
         return False
 
 async def main():
     """Main function to run all tests."""
-    print("🚀 Deep Research MCP Server Client Examples")
+    print("Deep Research MCP Server Client Examples")
     print("=" * 50)
     
     # Check if server is running
@@ -159,16 +165,16 @@ async def main():
         async with aiohttp.ClientSession() as session:
             async with session.get("http://localhost:8000/health") as response:
                 if response.status != 200:
-                    print("❌ MCP server is not running or not healthy")
+                    print("MCP server is not running or not healthy")
                     print("   Start the server with: python -m src.mcp_server")
                     return
     except Exception:
-        print("❌ Cannot connect to MCP server")
+        print("Cannot connect to MCP server")
         print("   Make sure the server is running on localhost:8000")
         print("   Start with: python -m src.mcp_server")
         return
     
-    print("✅ MCP server is running")
+    print("MCP server is running")
     
     # Run tests
     tests = [
@@ -181,12 +187,12 @@ async def main():
         try:
             await test()
         except Exception as e:
-            print(f"❌ Test {test.__name__} failed: {e}")
+            print(f"Test {test.__name__} failed: {e}")
         
         print()  # Add spacing between tests
     
-    print("🎉 Client examples completed!")
-    print("\n💡 To use the research tool with real API keys:")
+    print("Client examples completed!")
+    print("\nTo use the research tool with real API keys:")
     print("   1. Set GEMINI_API_KEY environment variable")
     print("   2. Start the server: python -m src.mcp_server")
     print("   3. Use FastMCP client or HTTP requests to call the research tool")

@@ -7,7 +7,7 @@ and validation for required credentials.
 
 import os
 from typing import Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -39,20 +39,23 @@ class MCPServerConfig(BaseModel):
     request_timeout: int = Field(default=300, description="Request timeout in seconds")
     max_concurrent_requests: int = Field(default=10, description="Maximum concurrent requests")
     
-    @validator('gemini_api_key')
+    @field_validator('gemini_api_key')
+    @classmethod
     def validate_gemini_api_key(cls, v):
         if not v:
             raise ValueError("GEMINI_API_KEY is required")
         return v
     
-    @validator('log_level')
+    @field_validator('log_level')
+    @classmethod
     def validate_log_level(cls, v):
         valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         if v.upper() not in valid_levels:
             raise ValueError(f"Invalid log level. Must be one of: {valid_levels}")
         return v.upper()
     
-    @validator('port')
+    @field_validator('port')
+    @classmethod
     def validate_port(cls, v):
         if not 1 <= v <= 65535:
             raise ValueError("Port must be between 1 and 65535")
@@ -81,11 +84,11 @@ def validate_config() -> None:
     """Validate the configuration and raise errors if invalid."""
     try:
         config = get_config()
-        print(f"✅ Configuration validated successfully")
+        print(f"Configuration validated successfully")
         print(f"   - Server: {config.host}:{config.port}")
         print(f"   - Log Level: {config.log_level}")
         print(f"   - Default Model: {config.default_reasoning_model}")
         print(f"   - Max Concurrent Requests: {config.max_concurrent_requests}")
     except Exception as e:
-        print(f"❌ Configuration validation failed: {e}")
+        print(f"Configuration validation failed: {e}")
         raise 
