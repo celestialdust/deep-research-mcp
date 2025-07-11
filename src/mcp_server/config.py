@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class MCPServerConfig(BaseModel):
+class Config(BaseModel):
     """Configuration for the MCP server."""
     
     # Server settings
@@ -39,6 +39,20 @@ class MCPServerConfig(BaseModel):
     request_timeout: int = Field(default=300, description="Request timeout in seconds")
     max_concurrent_requests: int = Field(default=10, description="Maximum concurrent requests")
     
+    # Additional server configuration
+    reasoning_model: str = Field(default="gemini-2.5-pro", description="Main reasoning model")
+    
+    def get_server_info(self) -> dict:
+        """Get server configuration info."""
+        return {
+            "host": self.host,
+            "port": self.port,
+            "log_level": self.log_level,
+            "reasoning_model": self.reasoning_model,
+            "max_concurrent_requests": self.max_concurrent_requests,
+            "request_timeout": self.request_timeout
+        }
+    
     @field_validator('gemini_api_key')
     @classmethod
     def validate_gemini_api_key(cls, v):
@@ -62,11 +76,11 @@ class MCPServerConfig(BaseModel):
         return v
 
 
-def get_config() -> MCPServerConfig:
+def get_config() -> Config:
     """Get the server configuration from environment variables."""
-    return MCPServerConfig(
-        host=os.getenv("MCP_SERVER_HOST", "0.0.0.0"),
-        port=int(os.getenv("MCP_SERVER_PORT", "8000")),
+    return Config(
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8000")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
         gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
         default_max_research_loops=int(os.getenv("DEFAULT_MAX_RESEARCH_LOOPS", "2")),
@@ -76,7 +90,8 @@ def get_config() -> MCPServerConfig:
         reflection_model=os.getenv("REFLECTION_MODEL", "gemini-2.5-flash"),
         answer_model=os.getenv("ANSWER_MODEL", "gemini-2.5-pro"),
         request_timeout=int(os.getenv("REQUEST_TIMEOUT", "300")),
-        max_concurrent_requests=int(os.getenv("MAX_CONCURRENT_REQUESTS", "10"))
+        max_concurrent_requests=int(os.getenv("MAX_CONCURRENT_REQUESTS", "10")),
+        reasoning_model=os.getenv("DEFAULT_REASONING_MODEL", "gemini-2.5-pro")
     )
 
 

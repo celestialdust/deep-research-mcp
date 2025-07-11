@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from fastmcp import FastMCP, Context
 from fastmcp.server import MCP
 
-from .config import Config
+from .config import get_config
 from .agent_adapter import AgentAdapter
 from .utils import setup_logging, validate_research_params
 
@@ -22,7 +22,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 # Load configuration
-config = Config()
+config = get_config()
 
 # Initialize agent adapter
 agent_adapter = AgentAdapter(config)
