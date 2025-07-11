@@ -13,7 +13,7 @@ from langchain_core.runnables import RunnableConfig
 
 from agent.graph import graph
 from agent.configuration import Configuration
-from .config import MCPServerConfig
+from .config import Config
 
 
 class ProgressCallback:
@@ -68,7 +68,7 @@ class ResearchResult:
 class LangGraphAgentAdapter:
     """Adapter for the LangGraph research agent."""
     
-    def __init__(self, config: MCPServerConfig):
+    def __init__(self, config: Config):
         self.config = config
         self.agent = graph  # The compiled LangGraph agent
         self._request_count = 0

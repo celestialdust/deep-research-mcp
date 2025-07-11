@@ -7,15 +7,14 @@ deep research agent as an MCP tool with progress streaming and health monitoring
 
 import os
 import logging
+import asyncio
 from typing import Dict, Any, Optional
-from contextlib import asynccontextmanager
 
 from fastmcp import FastMCP, Context
-from fastmcp.server import MCP
 
 from .config import get_config
-from .agent_adapter import AgentAdapter
-from .utils import setup_logging, validate_research_params
+from .agent_adapter import LangGraphAgentAdapter
+from .utils import setup_logging, validate_research_parameters
 
 # Configure logging
 setup_logging()
@@ -25,28 +24,23 @@ logger = logging.getLogger(__name__)
 config = get_config()
 
 # Initialize agent adapter
-agent_adapter = AgentAdapter(config)
+agent_adapter = LangGraphAgentAdapter(config)
 
-@asynccontextmanager
-async def lifespan(app: FastMCP):
-    """Startup and shutdown events for the MCP server."""
+async def initialize_server():
+    """Initialize the MCP server and agent adapter."""
     logger.info("🚀 Starting Deep Research MCP Server...")
     logger.info(f"📊 Server configuration: {config.get_server_info()}")
     
-    # Initialize the agent adapter
-    await agent_adapter.initialize()
-    
-    yield
-    
-    # Cleanup
-    await agent_adapter.cleanup()
-    logger.info("✅ Deep Research MCP Server shutdown complete")
+    # Test agent adapter health
+    try:
+        health = await agent_adapter.health_check()
+        logger.info(f"✅ Agent adapter health check: {health['status']}")
+    except Exception as e:
+        logger.error(f"❌ Agent adapter health check failed: {e}")
+        # Don't raise here, as the agent might still work
 
 # Create FastMCP server - Updated for Render compatibility
 mcp = FastMCP("Deep Research Agent")
-
-# Add the lifespan context manager
-mcp.app.router.lifespan_context = lifespan
 
 @mcp.tool()
 async def research(
@@ -76,7 +70,7 @@ async def research(
     
     # Validate parameters
     try:
-        validate_research_params(
+        validate_research_parameters(
             topic=topic,
             max_research_loops=max_research_loops,
             initial_search_query_count=initial_search_query_count,
@@ -92,21 +86,32 @@ async def research(
         if ctx:
             ctx.info("🚀 Initializing research agent...")
         
-        result = await agent_adapter.execute_research(
+        # Create progress callback if context is available
+        progress_callback = None
+        if ctx:
+            from .agent_adapter import ProgressCallback
+            progress_callback = ProgressCallback(
+                callback_fn=lambda msg: asyncio.create_task(ctx.info(msg))
+            )
+        
+        result = await agent_adapter.research(
             topic=topic,
             max_research_loops=max_research_loops,
             initial_search_query_count=initial_search_query_count,
             reasoning_model=reasoning_model,
-            progress_callback=lambda msg: ctx.info(f"📊 {msg}") if ctx else None
+            progress_callback=progress_callback
         )
+        
+        # Convert ResearchResult to dictionary format
+        result_dict = result.to_dict()
         
         if ctx:
             ctx.info(f"✅ Research completed successfully!")
-            ctx.info(f"📄 Report length: {len(result['report'])} characters")
-            ctx.info(f"🔗 Sources found: {len(result['sources'])}")
-            ctx.info(f"⏱️ Execution time: {result['metadata']['execution_time']:.2f}s")
+            ctx.info(f"📄 Report length: {len(result_dict['report'])} characters")
+            ctx.info(f"🔗 Sources found: {len(result_dict['sources'])}")
+            ctx.info(f"⏱️ Execution time: {result_dict['metadata']['execution_time']:.2f}s")
         
-        return result
+        return result_dict
         
     except Exception as e:
         error_msg = f"Research failed: {str(e)}"
@@ -121,11 +126,17 @@ async def health_check(request):
     """Health check endpoint for monitoring."""
     from starlette.responses import JSONResponse
     
+    try:
+        agent_health = await agent_adapter.health_check()
+        agent_status = agent_health.get("status", "unknown")
+    except Exception:
+        agent_status = "error"
+    
     return JSONResponse({
         "status": "healthy",
         "service": "Deep Research MCP Server",
         "version": "1.0.0",
-        "agent_status": "ready" if agent_adapter.is_ready() else "initializing"
+        "agent_status": agent_status
     })
 
 # Stats endpoint
@@ -134,7 +145,7 @@ async def stats(request):
     """Get server statistics."""
     from starlette.responses import JSONResponse
     
-    stats = await agent_adapter.get_stats()
+    stats = agent_adapter.get_stats()
     return JSONResponse({
         "server_stats": stats,
         "config": config.get_server_info()
@@ -148,6 +159,12 @@ if __name__ == "__main__":
     
     logger.info(f"🌐 Starting server on {host}:{port}")
     logger.info(f"🔑 Using model: {config.reasoning_model}")
+    
+    # Initialize server components
+    try:
+        asyncio.run(initialize_server())
+    except Exception as e:
+        logger.error(f"❌ Server initialization failed: {e}")
     
     # Run with streamable HTTP transport for Render
     mcp.run(
