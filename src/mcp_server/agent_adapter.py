@@ -11,8 +11,8 @@ from typing import Dict, List, Optional, Callable, Any
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
 
-from agent.graph import graph
-from agent.configuration import Configuration
+from ..agent.graph import graph
+from ..agent.configuration import Configuration
 from .config import Config
 
 

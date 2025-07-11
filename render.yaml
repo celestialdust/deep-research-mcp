@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && pip install -e .
     startCommand: python -m src.mcp_server.server
     healthCheckPath: /health
     envVars:
