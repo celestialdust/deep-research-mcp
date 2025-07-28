@@ -354,32 +354,6 @@ The server provides structured logging with:
 - **Rate Limiting**: Built-in request throttling
 - **Error Handling**: Secure error responses without sensitive data exposure
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and add tests
-4. Commit your changes: `git commit -am 'Add feature'`
-5. Push to the branch: `git push origin feature-name`
-6. Submit a pull request
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/deep-research-mcp/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/deep-research-mcp/discussions)
-- **Documentation**: [Project Wiki](https://github.com/your-username/deep-research-mcp/wiki)
-
-## 🙏 Acknowledgments
-
-- **LangGraph**: For the powerful agent orchestration framework
-- **FastMCP**: For the excellent MCP server implementation
-- **Google AI**: For the Gemini models and Search API
-- **Render**: For the seamless deployment platform
-
----
-
-**Ready to deploy?** 🚀 [Deploy to Render now](https://render.com/deploy) or explore the [examples](examples/) directory for more usage patterns. 
