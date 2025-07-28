@@ -28,15 +28,15 @@ agent_adapter = LangGraphAgentAdapter(config)
 
 async def initialize_server():
     """Initialize the MCP server and agent adapter."""
-    logger.info("🚀 Starting Deep Research MCP Server...")
-    logger.info(f"📊 Server configuration: {config.get_server_info()}")
+    logger.info("Starting Deep Research MCP Server...")
+    logger.info(f"Server configuration: {config.get_server_info()}")
     
     # Test agent adapter health
     try:
         health = await agent_adapter.health_check()
-        logger.info(f"✅ Agent adapter health check: {health['status']}")
+        logger.info(f"Agent adapter health check: {health['status']}")
     except Exception as e:
-        logger.error(f"❌ Agent adapter health check failed: {e}")
+        logger.error(f"Agent adapter health check failed: {e}")
         # Don't raise here, as the agent might still work
 
 # Create FastMCP server - Updated for Render compatibility
@@ -78,7 +78,7 @@ async def research(
         )
     except ValueError as e:
         if ctx:
-            ctx.error(f"❌ Invalid parameters: {str(e)}")
+            ctx.error(f"Invalid parameters: {str(e)}")
         raise
     
     # Execute research

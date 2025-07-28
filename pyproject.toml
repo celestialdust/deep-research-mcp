@@ -3,7 +3,7 @@ name = "deep-research-mcp"
 version = "0.1.0"
 description = "MCP server for the LangGraph deep research agent"
 authors = [
-    { name = "Philipp Schmid", email = "schmidphilipp1995@gmail.com" },
+    { name = "Joey", email = "hsefzxuejoey@gmail.com" },
 ]
 readme = "README.md"
 license = { text = "MIT" }
